@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid;
+    
+    pid = fork();  // Create child process
+
+    if (pid == 0) {
+        // Child process
+        printf("Child: Running 'ls' command using exec\n");
+        execl("/bin/ls", "ls", NULL);  // Replace child with 'ls'
+        // This line runs only if exec fails
+        printf("Child: exec failed\n");
+    }
+    else if (pid > 0) {
+        // Parent process
+        wait(NULL);  // Wait for child to finish
+        printf("Parent: Child process finished\n");
+    }
+    else {
+        // Fork failed
+        printf("Fork failed\n");
+    }
+
+    return 0;
+}

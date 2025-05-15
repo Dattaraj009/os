@@ -1,0 +1,52 @@
+#!/bin/bash
+
+DB="students.txt"
+touch $DB  # Create the file if it doesn't exist
+
+while true; do
+  echo ""
+  echo "------ Student Database ------"
+  echo "1. Add Student"
+  echo "2. View All Students"
+  echo "3. Search by Roll Number"
+  echo "4. Exit"
+  echo -n "Enter your choice: "
+  read choice
+
+  case $choice in
+    1)
+      echo -n "Enter student name: "
+      read name
+      echo -n "Enter roll number: "
+      read roll
+      echo -n "Enter branch: "
+      read branch
+      echo -n "Enter marks: "
+      read marks
+      echo "$name,$roll,$branch,$marks" >> "$DB"
+      echo "Student added!"
+      ;;
+    
+    2)
+      echo ""
+      echo "---- All Students ----"
+      awk -F, '{printf "Name: %s, Roll: %s, Branch: %s, Marks: %s\n", $1, $2, $3, $4}' "$DB"
+      ;;
+    
+    3)
+      echo -n "Enter roll number to search: "
+      read sroll
+      echo "---- Search Result ----"
+      awk -F, -v r="$sroll" '$2 == r {printf "Name: %s, Roll: %s, Branch: %s, Marks: %s\n", $1, $2, $3, $4}' "$DB"
+      ;;
+    
+    4)
+      echo "Exiting..."
+      exit 0
+      ;;
+    
+    *)
+      echo "Invalid choice! Please try again."
+      ;;
+  esac
+done

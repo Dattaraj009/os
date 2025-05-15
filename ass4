@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int fd[2]; // fd[0] - read end, fd[1] - write end
+    char message[] = "Hello from parent!";
+    char buffer[100];
+
+    pipe(fd); // Create the pipe
+
+    if (fork() == 0) {
+        // Child process
+        close(fd[1]); // Close write end (child will only read)
+        read(fd[0], buffer, sizeof(buffer)); // Read data from pipe
+        printf("Child received: %s\n", buffer);
+        close(fd[0]); // Close read end after reading
+    } else {
+        // Parent process
+        close(fd[0]); // Close read end (parent will only write)
+        write(fd[1], message, strlen(message) + 1); // Write data to pipe
+        close(fd[1]); // Close write end after writing
+    }
+
+    return 0;
+}

@@ -1,0 +1,114 @@
+#include <stdio.h>
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4};
+    int n = 8;
+    int capacity = 3;
+
+    // FIFO
+    printf("\nFIFO Page Replacement:\n");
+    int frames1[3], count1 = 0, front = 0, faults1 = 0;
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+        for (int j = 0; j < count1; j++) {
+            if (frames1[j] == pages[i]) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            if (count1 < capacity) {
+                frames1[count1++] = pages[i];
+            } else {
+                frames1[front] = pages[i];
+                front = (front + 1) % capacity;
+            }
+            faults1++;
+        }
+        printf("Frames: ");
+        for (int k = 0; k < count1; k++) printf("%d ", frames1[k]);
+        printf("\n");
+    }
+    printf("Total Page Faults (FIFO): %d\n", faults1);
+
+    // LRU
+    printf("\nLRU Page Replacement:\n");
+    int frames2[3], time[3], count2 = 0, faults2 = 0, currentTime = 0;
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+        for (int j = 0; j < count2; j++) {
+            if (frames2[j] == pages[i]) {
+                found = 1;
+                time[j] = currentTime++;
+                break;
+            }
+        }
+        if (!found) {
+            if (count2 < capacity) {
+                frames2[count2] = pages[i];
+                time[count2] = currentTime++;
+                count2++;
+            } else {
+                int lru = 0;
+                for (int j = 1; j < capacity; j++) {
+                    if (time[j] < time[lru])
+                        lru = j;
+                }
+                frames2[lru] = pages[i];
+                time[lru] = currentTime++;
+            }
+            faults2++;
+        }
+        printf("Frames: ");
+        for (int k = 0; k < count2; k++) printf("%d ", frames2[k]);
+        printf("\n");
+    }
+    printf("Total Page Faults (LRU): %d\n", faults2);
+
+    // Optimal
+    printf("\nOptimal Page Replacement:\n");
+    int frames3[3], count3 = 0, faults3 = 0;
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+        for (int j = 0; j < count3; j++) {
+            if (frames3[j] == pages[i]) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            if (count3 < capacity) {
+                frames3[count3++] = pages[i];
+            } else {
+                int index = -1, farthest = i + 1;
+                for (int j = 0; j < capacity; j++) {
+                    int foundInFuture = 0;
+                    for (int k = i + 1; k < n; k++) {
+                        if (frames3[j] == pages[k]) {
+                            if (k > farthest) {
+                                farthest = k;
+                                index = j;
+                            }
+                            foundInFuture = 1;
+                            break;
+                        }
+                    }
+                    if (!foundInFuture) {
+                        index = j;
+                        break;
+                    }
+                }
+                if (index == -1)
+                    index = 0;
+                frames3[index] = pages[i];
+            }
+            faults3++;
+        }
+        printf("Frames: ");
+        for (int k = 0; k < count3; k++) printf("%d ", frames3[k]);
+        printf("\n");
+    }
+    printf("Total Page Faults (Optimal): %d\n", faults3);
+
+    return 0;
+}

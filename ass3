@@ -1,0 +1,32 @@
+#include <stdio.h>     // For printf
+#include <pthread.h>   // For threads
+
+// This function will run in a new thread
+void* myThreadFunction(void* arg) {
+    // Convert void* back to char* to get our message
+    char* message = (char*)arg;
+    printf("Thread says: %s\n", message);  // Print from thread
+    return NULL;  // Thread ends
+}
+
+int main() {
+    pthread_t thread;  // This is like a thread variable
+    char* msg = "Hello from thread!";  // Message to send to thread
+
+    // Create a thread that runs 'myThreadFunction' with 'msg' as argument
+    if (pthread_create(&thread, NULL, myThreadFunction, (void*)msg)) {
+        // If thread creation fails
+        fprintf(stderr, "Error creating thread\n");
+        return 1;
+    }
+
+    // Wait (join) until thread finishes before continuing
+    if (pthread_join(thread, NULL)) {
+        // If joining fails
+        fprintf(stderr, "Error joining thread\n");
+        return 2;
+    }
+
+    printf("Thread has finished.\n");
+    return 0;
+}

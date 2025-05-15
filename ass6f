@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+int main() {
+    int frame_size = 3;
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2};  // Hardcoded page reference string
+    int n = sizeof(pages) / sizeof(pages[0]);
+    int frames[3];  // Changed from queue[] to frames[]
+    int front = 0, count = 0, page_faults = 0;
+
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+
+        // Check if page already exists in frames
+        for (int j = 0; j < count; j++) {
+            if (frames[j] == pages[i]) {
+                found = 1;
+                break;
+            }
+        }
+
+        if (!found) {
+            if (count < frame_size) {
+                frames[count++] = pages[i];
+            } else {
+                frames[front] = pages[i];
+                front = (front + 1) % frame_size;
+            }
+            page_faults++;
+        }
+    }
+
+    printf("Total Page Faults using FIFO: %d\n", page_faults);
+    return 0;
+}

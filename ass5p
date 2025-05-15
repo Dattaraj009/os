@@ -1,0 +1,54 @@
+#include <stdio.h>
+
+int main() {
+    int n, i, j;
+    int at[10], bt[10], priority[10];
+    int ct[10], tat[10], wt[10];
+    int time = 0, completed = 0;
+    int is_completed[10] = {0};
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++) {
+        printf("Enter Arrival Time, Burst Time and Priority for process %d: ", i+1);
+        scanf("%d %d %d", &at[i], &bt[i], &priority[i]);
+    }
+
+    while(completed != n) {
+        int idx = -1;
+        int highest_priority = 9999;
+
+        for(i = 0; i < n; i++) {
+            if(at[i] <= time && is_completed[i] == 0) {
+                if(priority[i] < highest_priority) {  // lower number = higher priority
+                    highest_priority = priority[i];
+                    idx = i;
+                } else if(priority[i] == highest_priority) {
+                    if(at[i] < at[idx]) {  // if same priority, choose earlier arrival
+                        idx = i;
+                    }
+                }
+            }
+        }
+
+        if(idx != -1) {
+            time += bt[idx];
+            ct[idx] = time;
+            tat[idx] = ct[idx] - at[idx];
+            wt[idx] = tat[idx] - bt[idx];
+            is_completed[idx] = 1;
+            completed++;
+        } else {
+            time++;
+        }
+    }
+
+    printf("\nPriority Scheduling (Non-Preemptive):\n");
+    printf("P#\tAT\tBT\tPrio\tCT\tTAT\tWT\n");
+    for(i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\n", i+1, at[i], bt[i], priority[i], ct[i], tat[i], wt[i]);
+    }
+
+    return 0;
+}

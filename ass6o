@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4};
+    int n = 8;
+    int capacity = 3;
+    int frames[3];
+    int count = 0, faults = 0;
+
+    printf("Optimal Page Replacement:\n");
+
+    for (int i = 0; i < n; i++) {
+        int found = 0;
+
+        // Check if page is already in frames
+        for (int j = 0; j < count; j++) {
+            if (frames[j] == pages[i]) {
+                found = 1;
+                break;
+            }
+        }
+
+        // Page fault if not found
+        if (!found) {
+            if (count < capacity) {
+                frames[count++] = pages[i];
+            } else {
+                int index = -1, farthest = i + 1;
+
+                for (int j = 0; j < capacity; j++) {
+                    int k;
+                    for (k = i + 1; k < n; k++) {
+                        if (frames[j] == pages[k]) {
+                            if (k > farthest) {
+                                farthest = k;
+                                index = j;
+                            }
+                            break;
+                        }
+                    }
+                    if (k == n) {  // page not found in future
+                        index = j;
+                        break;
+                    }
+                }
+
+                if (index == -1)
+                    index = 0;
+
+                frames[index] = pages[i];
+            }
+            faults++;
+        }
+
+        // Print frames
+        printf("Frames: ");
+        for (int j = 0; j < count; j++)
+            printf("%d ", frames[j]);
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", faults);
+    return 0;
+}
